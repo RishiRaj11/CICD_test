@@ -3,32 +3,35 @@ import './Quiz.css';
 import { data } from '../data.js';
 
 const Quiz = () => {
-    let [showScoreScreen, setShowScoreScreen] = useState(false);
-    let [index, setIndex] = useState(0);
-    let [question, setQuestion] = useState(data[index]);
-    let [score, setScore] = useState(0);
-    let [lock, setLock] = useState(false);
+    const [showScoreScreen, setShowScoreScreen] = useState(false);
+    const [index, setIndex] = useState(0);
+    const [question, setQuestion] = useState(data[index]);
+    const [score, setScore] = useState(0);
+    const [lock, setLock] = useState(false);
 
-    let Option1 = useRef(null);
-    let Option2 = useRef(null);
-    let Option3 = useRef(null);
-    let Option4 = useRef(null);
+    const Option1 = useRef(null);
+    const Option2 = useRef(null);
+    const Option3 = useRef(null);
+    const Option4 = useRef(null);
 
-    let optionArray = [Option1, Option2, Option3, Option4];
+    const optionArray = [Option1, Option2, Option3, Option4];
 
     const nextHandler = () => {
         if (!showScoreScreen) {
             setLock(false);
+            // Set next question if there's a next question available
             if (index + 1 < data.length) {
-                setIndex(index + 1);
+                setIndex(prevIndex => prevIndex + 1);
                 setQuestion(data[index + 1]);
             }
+
+            // Reset option classes for the next question
             optionArray.forEach((option) => {
                 option.current.classList.remove("correct");
                 option.current.classList.remove("incorrect");
             });
-        }
-        if (index + 1 === data.length) {
+        } else {
+            // If it's the last question, show the score screen
             setShowScoreScreen(true);
         }
     };
@@ -59,20 +62,24 @@ const Quiz = () => {
             <h1>Quiz app</h1>
             <hr />
             {
-                showScoreScreen ? <>
-                    <h2>{`Your score is ${score} out of ${data.length}`}</h2>
-                    <button onClick={startQuiz} >Play Again</button>
-                </> : <>
-                    <h2>{`${index + 1}. ${question.question}`}</h2>
-                    <ul>
-                        <li ref={Option1} onClick={(e) => checkAns(e, 1)} >{question.option1}</li>
-                        <li ref={Option2} onClick={(e) => checkAns(e, 2)} >{question.option2}</li>
-                        <li ref={Option3} onClick={(e) => checkAns(e, 3)} >{question.option3}</li>
-                        <li ref={Option4} onClick={(e) => checkAns(e, 4)} >{question.option4}</li>
-                    </ul>
-                    <button onClick={nextHandler}>Next</button>
-                    <div className='index'>{` question ${index + 1} of ${data.length}`}</div>
-                </>
+                showScoreScreen ? (
+                    <>
+                        <h2>{`Your score is ${score} out of ${data.length}`}</h2>
+                        <button onClick={startQuiz}>Play Again</button>
+                    </>
+                ) : (
+                    <>
+                        <h2>{`${index + 1}. ${question.question}`}</h2>
+                        <ul>
+                            <li ref={Option1} onClick={(e) => checkAns(e, 1)}>{question.option1}</li>
+                            <li ref={Option2} onClick={(e) => checkAns(e, 2)}>{question.option2}</li>
+                            <li ref={Option3} onClick={(e) => checkAns(e, 3)}>{question.option3}</li>
+                            <li ref={Option4} onClick={(e) => checkAns(e, 4)}>{question.option4}</li>
+                        </ul>
+                        <button onClick={nextHandler}>Next</button>
+                        <div className='index'>{`Question ${index + 1} of ${data.length}`}</div>
+                    </>
+                )
             }
         </div>
     );
